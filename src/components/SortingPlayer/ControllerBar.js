@@ -1,11 +1,11 @@
 import React from 'react';
 import Button from '../Button';
 
-const ControllerBar = ({ onReset }) => {
+const ControllerBar = ({ onReset, onPlay, onStop }) => {
   return (
     <div className='flex flex-row mt-5'>
-      <Button>Start</Button>
-      <Button>Stop</Button>
+      <Button onClick={onPlay}>Start</Button>
+      <Button onClick={onStop}>Stop</Button>
       <Button onClick={onReset}>Reset</Button>
     </div>
   );
