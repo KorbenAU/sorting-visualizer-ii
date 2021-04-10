@@ -5,10 +5,13 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     colors: {
-      gray: colors.coolGray,
-      blue: colors.lightBlue,
+      blue_dark: '#219ebc',
+      blue_light: '#8ecae6',
+      black: '#023047',
+      org_light: '#ffb703',
+      org_dark: '#fb8500',
+      white: colors.white,
       red: colors.rose,
-      pink: colors.fuchsia,
     },
     fontFamily: {
       sans: ['Graphik', 'sans-serif'],
