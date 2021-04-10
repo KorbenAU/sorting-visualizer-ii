@@ -15,6 +15,7 @@ const Button = ({ onClick, children }) => {
     'rounded-md',
     'border-black',
     'shadow-lg',
+    'w-20',
   ];
 
   return (

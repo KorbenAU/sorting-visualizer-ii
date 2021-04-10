@@ -1,14 +1,12 @@
 import React from 'react';
-import SortingPlayer from './components/SortingPlayer/SortingPlayer';
-import Button from './components/Button';
+import SortingPlayerPage from './pages/SortingPlayerPage';
 
 function App() {
   return (
     <>
       <div className='h-screen w-screen'>
-        <SortingPlayer />
+        <SortingPlayerPage />
       </div>
-      <Button>Test Test</Button>
     </>
   );
 }

@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import Bar from './Bar';
 
-const SortingPlayer = () => {
-  const [numbers, setNumbers] = useState([13, 45, 23, 67, 12, 55, 100, 10]);
-
+const SortingPlayer = ({ numbers }) => {
   return (
-    <div className="flex flex-row h-full w-full items-end justify-center">
-      {numbers.map((number) => (
-        <Bar value={number} comparing />
-      ))}
+    <div className='flex flex-row h-4/6 w-10/12 items-end justify-center'>
+      {numbers.map((number, index) => {
+        return <Bar key={index} number={number} comparing />;
+      })}
     </div>
   );
 };
