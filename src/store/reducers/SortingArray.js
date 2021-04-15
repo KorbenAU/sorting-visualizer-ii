@@ -46,17 +46,32 @@ const switchItems = (indices, state) => {
   };
 };
 
+const changeItems = (index, newValue, state) => {
+  const updateItems = getResetState(state.sortingItems);
+  console.log(`changing index: ${index}`);
+  updateItems[index].switching = true;
+  updateItems[index].value = newValue;
+  return {
+    ...state,
+    sortingItems: updateItems,
+    playingIndex: state.playingIndex + 1,
+  };
+};
+
 const SortingArrayReducer = (state = INITIAL_STATE, action) => {
   console.log(action.type);
   switch (action.type) {
     case Types.NEXT_STEP:
       const nextIndex = state.playingIndex + 1;
       const animation = state.animationSteps[nextIndex];
+      console.log(animation.type);
       switch (animation.type) {
         case 'comparing':
           return compareItems(animation.targets, state);
         case 'switching':
           return switchItems(animation.targets, state);
+        case 'changing':
+          return changeItems(animation.target, animation.value, state);
         default:
           console.log('wrong action type');
       }
@@ -80,11 +95,13 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
       return switchItems(action.payload.indices);
     case Types.GENERATE_ANIMATION:
       const { sortingFunc } = action.payload;
+      const animations = sortingFunc(
+        state.sortingItems.map((item) => item.value)
+      );
+      console.log(animations);
       return {
         ...state,
-        animationSteps: sortingFunc(
-          state.sortingItems.map((item) => item.value)
-        ),
+        animationSteps: animations,
         playingIndex: -1,
       };
     case Types.RESET_ITEMS_STATE:

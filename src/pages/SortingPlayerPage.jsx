@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import ControllerBar from '../components/SortingPlayer/ControllerBar';
 import SortingPlayer from '../components/SortingPlayer/SortingPlayer';
 import bubbleSort from '../SortingFunctions/BubbleSort';
+import mergeSort from '../SortingFunctions/MergeSort';
 import { connect } from 'react-redux';
 import * as SortingActions from '../store/actions/SortingArray';
 
-const BAR_NUMBER = 10;
+const BAR_NUMBER = 50;
 const INTERVAL_TIME = 50;
 
 const SortingPlayerPage = ({
@@ -33,7 +34,7 @@ const SortingPlayerPage = ({
         console.log('===============[animation is done!]=================');
         clearInterval(intervalID);
         resetItemsState();
-        generateAnimation(bubbleSort);
+        generateAnimation(mergeSort);
       } else {
         nextStep();
       }
@@ -62,7 +63,7 @@ const SortingPlayerPage = ({
         }}
         onPlay={play}
         onStop={stopHandler}
-        onAnimationGen={() => generateAnimation(bubbleSort)}
+        onAnimationGen={() => generateAnimation(mergeSort)}
       />
     </div>
   );
