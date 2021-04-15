@@ -1,4 +1,4 @@
-import { resetItemsState, Types } from '../actions/SortingArray';
+import { Types } from '../actions/SortingArray';
 
 const INITIAL_STATE = {
   sortingItems: [],
@@ -48,7 +48,6 @@ const switchItems = (indices, state) => {
 
 const changeItems = (index, newValue, state) => {
   const updateItems = getResetState(state.sortingItems);
-  console.log(`changing index: ${index}`);
   updateItems[index].switching = true;
   updateItems[index].value = newValue;
   return {
@@ -64,7 +63,6 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
     case Types.NEXT_STEP:
       const nextIndex = state.playingIndex + 1;
       const animation = state.animationSteps[nextIndex];
-      console.log(animation.type);
       switch (animation.type) {
         case 'comparing':
           return compareItems(animation.targets, state);
@@ -76,10 +74,16 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
           console.log('wrong action type');
       }
     case Types.RESET_SORTING_ITEMS:
+      const set = new Set();
       const { length } = action.payload;
       const items = new Array(length).fill(0).map((_) => {
+        let randomNum = Math.floor(Math.random() * 130) + 1;
+        while (set.has(randomNum)) {
+          randomNum = Math.floor(Math.random() * 130) + 1;
+        }
+        set.add(randomNum);
         return {
-          value: Math.floor(Math.random() * 130) + 1,
+          value: randomNum,
           comparing: false,
           switching: false,
         };
@@ -98,7 +102,6 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
       const animations = sortingFunc(
         state.sortingItems.map((item) => item.value)
       );
-      console.log(animations);
       return {
         ...state,
         animationSteps: animations,
