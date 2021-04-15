@@ -1,7 +1,7 @@
 import React from 'react';
 
-const Bar = ({ number }) => {
-  const { value, comparing, switching } = number;
+const Bar = ({ sortingItem }) => {
+  const { value, comparing, switching } = sortingItem;
 
   let barClasses = ['border', 'mx-0.5', 'rounded-t-md'];
 

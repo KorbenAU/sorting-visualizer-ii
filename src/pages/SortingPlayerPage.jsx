@@ -2,121 +2,92 @@ import React, { useEffect, useState } from 'react';
 import ControllerBar from '../components/SortingPlayer/ControllerBar';
 import SortingPlayer from '../components/SortingPlayer/SortingPlayer';
 import bubbleSort from '../SortingFunctions/BubbleSort';
+import { connect } from 'react-redux';
+import * as SortingActions from '../store/actions/SortingArray';
 
-const BAR_NUMBER = 60;
-const INTERVAL_TIME = 10;
+const BAR_NUMBER = 10;
+const INTERVAL_TIME = 50;
 
-const SortingPlayerPage = () => {
-    const [numbers, setNumbers] = useState([]);
-    const [steps, setSteps] = useState([]);
-    const [playingIndex, setPlayingIndex] = useState(-1);
-    const [repeatTask, setRepeatTask] = useState(null);
+const SortingPlayerPage = ({
+  animationSteps,
+  playingIndex,
+  resetSortingItems,
+  generateAnimation,
+  nextStep,
+  resetItemsState,
+}) => {
+  const [intervalID, setIntervalID] = useState(null);
 
-    function* iterateAnimation(animation) {
-        let index;
-        for (index = playingIndex + 1; index < animation.length; index++) {
-            setPlayingIndex(index);
-            yield animation[index];
-        }
+  function* iterateAnimation() {
+    let index;
+    for (index = playingIndex + 1; index < animationSteps.length; index++) {
+      yield animationSteps[index];
     }
+  }
 
-    let updateNumbers = [...numbers];
-    let interval = null;
-
-    const play = () => {
-        const it = iterateAnimation(steps);
-
-        const playHandler = () => {
-            const nextItem = it.next();
-            if (nextItem.done) {
-                clearInterval(interval);
-                setPlayingIndex(-1);
-                setNumbers(
-                    updateNumbers.map((item) => {
-                        return { ...item, comparing: false, switching: false };
-                    })
-                );
-                setRepeatTask(null);
-            } else {
-                dealWithStep(nextItem.value);
-            }
-        };
-
-        interval = setInterval(playHandler, INTERVAL_TIME);
-        setRepeatTask(interval);
+  const play = () => {
+    const it = iterateAnimation();
+    const playHandler = () => {
+      const nextAnimationStep = it.next();
+      if (nextAnimationStep.done) {
+        console.log('===============[animation is done!]=================');
+        clearInterval(intervalID);
+        resetItemsState();
+        generateAnimation(bubbleSort);
+      } else {
+        nextStep();
+      }
     };
 
-    const dealWithStep = (step) => {
-        updateNumbers = updateNumbers.map((item) => {
-            return { ...item, comparing: false, switching: false };
-        });
+    const intervalID = setInterval(playHandler, INTERVAL_TIME);
+    setIntervalID(intervalID);
+  };
 
-        switch (step.type) {
-            case 'comparing':
-                step.targets.forEach((index) => {
-                    updateNumbers[index].comparing = true;
-                });
-                break;
-            case 'switching':
-                step.targets.forEach((index) => {
-                    updateNumbers[index].switching = true;
-                });
-                const temp = updateNumbers[step.targets[0]].value;
-                updateNumbers[step.targets[0]].value =
-                    updateNumbers[step.targets[1]].value;
-                updateNumbers[step.targets[1]].value = temp;
-                break;
-            default:
-                console.log('wrong action type');
-        }
+  const stopHandler = () => {
+    clearInterval(intervalID);
+  };
 
-        setNumbers(updateNumbers);
-    };
+  useEffect(() => {
+    resetSortingItems();
+  }, []);
 
-    const generateArray = () => {
-        console.log('generate array numbers');
-        const numList = new Array(BAR_NUMBER).fill(0).map((_) => {
-            return {
-                value: Math.floor(Math.random() * 130) + 1,
-                comparing: false,
-                switching: false,
-            };
-        });
-        setNumbers(numList);
-        generateSteps(numList);
-    };
-
-    const stopHandler = () => {
-        clearInterval(repeatTask);
-        setRepeatTask(null);
-    };
-
-    const generateSteps = (numList) => {
-        const animation = bubbleSort(numList.map((item) => item.value));
-        console.log(animation);
-        setSteps(animation);
-    };
-
-    useEffect(() => {
-        generateArray();
-    }, []);
-
-    const resetHandler = () => {
-        generateArray();
-        setPlayingIndex(-1);
-    };
-
-    return (
-        <div className='w-full h-full flex flex-col items-center justify-center'>
-            <SortingPlayer numbers={numbers} />
-            <hr />
-            <ControllerBar
-                onReset={resetHandler}
-                onPlay={play}
-                onStop={stopHandler}
-            />
-        </div>
-    );
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center">
+      <SortingPlayer />
+      <hr />
+      <ControllerBar
+        onReset={() => {
+          clearInterval(intervalID);
+          resetSortingItems();
+        }}
+        onPlay={play}
+        onStop={stopHandler}
+        onAnimationGen={() => generateAnimation(bubbleSort)}
+      />
+    </div>
+  );
 };
 
-export default SortingPlayerPage;
+const mapStateToProps = (state) => {
+  return {
+    playingIndex: state.Sorting.playingIndex,
+    animationSteps: state.Sorting.animationSteps,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    resetSortingItems: () =>
+      dispatch(SortingActions.resetSortingItems(BAR_NUMBER)),
+    generateAnimation: (sortingFunc) =>
+      dispatch(SortingActions.generateAnimation(sortingFunc)),
+    switchItems: (indices) => dispatch(SortingActions.switchItems(indices)),
+    compareItems: (indices) => dispatch(SortingActions.compareItems(indices)),
+    nextStep: () => dispatch(SortingActions.nextStep()),
+    resetItemsState: () => dispatch(SortingActions.resetItemsState()),
+    start: () => dispatch(SortingActions.startPlay()),
+    pause: () => dispatch(SortingActions.pausePlay()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SortingPlayerPage);
