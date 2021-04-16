@@ -31,6 +31,22 @@ const compareItems = (indices, state) => {
   };
 };
 
+const markItems = (indices, state) => {
+  const updateItems = getResetState(state.sortingItems).map((item, index) => {
+    if (indices.includes(index)) {
+      item.marking = true;
+    } else {
+      item.marking = false;
+    }
+    return item;
+  });
+  return {
+    ...state,
+    sortingItems: updateItems,
+    playingIndex: state.playingIndex + 1,
+  };
+};
+
 const switchItems = (indices, state) => {
   const updateItems = getResetState(state.sortingItems);
   indices.forEach((index) => {
@@ -70,6 +86,8 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
           return switchItems(animation.targets, state);
         case 'changing':
           return changeItems(animation.target, animation.value, state);
+        case 'marking':
+          return markItems(animation.targets, state);
         default:
           console.log('wrong action type');
       }
@@ -86,6 +104,7 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
           value: randomNum,
           comparing: false,
           switching: false,
+          marking: false,
         };
       });
       return {
@@ -102,6 +121,7 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
       const animations = sortingFunc(
         state.sortingItems.map((item) => item.value)
       );
+      console.log(animations);
       return {
         ...state,
         animationSteps: animations,

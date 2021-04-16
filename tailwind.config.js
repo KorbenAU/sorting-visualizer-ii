@@ -1,4 +1,4 @@
-const colors = require('tailwindcss/colors');
+const Colors = require('tailwindcss/colors');
 
 module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
@@ -10,8 +10,8 @@ module.exports = {
       black: '#023047',
       org_light: '#ffb703',
       org_dark: '#fb8500',
-      white: colors.white,
-      red: colors.rose,
+      white: Colors.white,
+      danger: Colors.danger,
     },
     fontFamily: {
       sans: ['Graphik', 'sans-serif'],

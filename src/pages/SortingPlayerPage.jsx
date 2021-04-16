@@ -3,6 +3,7 @@ import ControllerBar from '../components/SortingPlayer/ControllerBar';
 import SortingPlayer from '../components/SortingPlayer/SortingPlayer';
 import bubbleSort from '../SortingFunctions/BubbleSort';
 import mergeSort from '../SortingFunctions/MergeSort';
+import selectSort from '../SortingFunctions/SelectSort';
 import { connect } from 'react-redux';
 import * as SortingActions from '../store/actions/SortingArray';
 
@@ -34,7 +35,7 @@ const SortingPlayerPage = ({
         console.log('===============[animation is done!]=================');
         clearInterval(intervalID);
         resetItemsState();
-        generateAnimation(mergeSort);
+        generateAnimation(selectSort);
       } else {
         nextStep();
       }
@@ -63,7 +64,7 @@ const SortingPlayerPage = ({
         }}
         onPlay={play}
         onStop={stopHandler}
-        onAnimationGen={() => generateAnimation(mergeSort)}
+        onAnimationGen={() => generateAnimation(selectSort)}
       />
     </div>
   );
