@@ -1,151 +1,155 @@
 import { Types } from '../actions/SortingArray';
 
 const INITIAL_STATE = {
-  sortingItems: [],
-  animationSteps: [],
-  playingIndex: [],
-  playing: false,
+    sortingItems: [],
+    animationSteps: [],
+    playingIndex: [],
+    playing: false,
 };
 
 const getResetState = (sortingItems) => {
-  return sortingItems.map((item) => {
-    return {
-      ...item,
-      switching: false,
-      comparing: false,
-    };
-  });
+    return sortingItems.map((item) => {
+        return {
+            ...item,
+            switching: false,
+            comparing: false,
+        };
+    });
 };
 
 const compareItems = (indices, state) => {
-  const updateItems = getResetState(state.sortingItems).map((item, index) => {
-    if (indices.includes(index)) {
-      item.comparing = true;
-    }
-    return item;
-  });
-  return {
-    ...state,
-    sortingItems: updateItems,
-    playingIndex: state.playingIndex + 1,
-  };
+    const updateItems = getResetState(state.sortingItems).map((item, index) => {
+        if (indices.includes(index)) {
+            item.comparing = true;
+        }
+        return item;
+    });
+    return {
+        ...state,
+        sortingItems: updateItems,
+        playingIndex: state.playingIndex + 1,
+    };
 };
 
 const markItems = (indices, state) => {
-  const updateItems = getResetState(state.sortingItems).map((item, index) => {
-    if (indices.includes(index)) {
-      item.marking = true;
-    } else {
-      item.marking = false;
-    }
-    return item;
-  });
-  return {
-    ...state,
-    sortingItems: updateItems,
-    playingIndex: state.playingIndex + 1,
-  };
+    const updateItems = getResetState(state.sortingItems).map((item, index) => {
+        if (indices.includes(index)) {
+            item.marking = true;
+        } else {
+            item.marking = false;
+        }
+        return item;
+    });
+    return {
+        ...state,
+        sortingItems: updateItems,
+        playingIndex: state.playingIndex + 1,
+    };
 };
 
 const switchItems = (indices, state) => {
-  const updateItems = getResetState(state.sortingItems);
-  indices.forEach((index) => {
-    updateItems[index].switching = true;
-  });
-  const temp = updateItems[indices[0]].value;
-  updateItems[indices[0]].value = updateItems[indices[1]].value;
-  updateItems[indices[1]].value = temp;
-  return {
-    ...state,
-    sortingItems: updateItems,
-    playingIndex: state.playingIndex + 1,
-  };
+    const updateItems = getResetState(state.sortingItems);
+    indices.forEach((index) => {
+        updateItems[index].switching = true;
+    });
+    const temp = updateItems[indices[0]].value;
+    updateItems[indices[0]].value = updateItems[indices[1]].value;
+    updateItems[indices[1]].value = temp;
+    return {
+        ...state,
+        sortingItems: updateItems,
+        playingIndex: state.playingIndex + 1,
+    };
 };
 
 const changeItems = (index, newValue, state) => {
-  const updateItems = getResetState(state.sortingItems);
-  updateItems[index].switching = true;
-  updateItems[index].value = newValue;
-  return {
-    ...state,
-    sortingItems: updateItems,
-    playingIndex: state.playingIndex + 1,
-  };
+    const updateItems = getResetState(state.sortingItems);
+    updateItems[index].switching = true;
+    updateItems[index].value = newValue;
+    return {
+        ...state,
+        sortingItems: updateItems,
+        playingIndex: state.playingIndex + 1,
+    };
 };
 
 const SortingArrayReducer = (state = INITIAL_STATE, action) => {
-  console.log(action.type);
-  switch (action.type) {
-    case Types.NEXT_STEP:
-      const nextIndex = state.playingIndex + 1;
-      const animation = state.animationSteps[nextIndex];
-      switch (animation.type) {
-        case 'comparing':
-          return compareItems(animation.targets, state);
-        case 'switching':
-          return switchItems(animation.targets, state);
-        case 'changing':
-          return changeItems(animation.target, animation.value, state);
-        case 'marking':
-          return markItems(animation.targets, state);
+    console.log(action.type);
+    switch (action.type) {
+        case Types.NEXT_STEP:
+            const nextIndex = state.playingIndex + 1;
+            const animation = state.animationSteps[nextIndex];
+            switch (animation.type) {
+                case 'comparing':
+                    return compareItems(animation.targets, state);
+                case 'switching':
+                    return switchItems(animation.targets, state);
+                case 'changing':
+                    return changeItems(
+                        animation.target,
+                        animation.value,
+                        state
+                    );
+                case 'marking':
+                    return markItems(animation.targets, state);
+                default:
+                    console.log('wrong action type');
+            }
+        case Types.RESET_SORTING_ITEMS:
+            const set = new Set();
+            const { length } = action.payload;
+            const items = new Array(length).fill(0).map((_) => {
+                let randomNum = Math.floor(Math.random() * 130) + 1;
+                while (set.has(randomNum)) {
+                    randomNum = Math.floor(Math.random() * 130) + 1;
+                }
+                set.add(randomNum);
+                return {
+                    value: randomNum,
+                    comparing: false,
+                    switching: false,
+                    marking: false,
+                };
+            });
+            return {
+                ...state,
+                sortingItems: items,
+                playingIndex: -1,
+            };
+        case Types.COMPARE_ITEMS:
+            return compareItems(action.payload.indices);
+        case Types.SWITCH_ITEMS:
+            return switchItems(action.payload.indices);
+        case Types.GENERATE_ANIMATION:
+            const { sortingFunc } = action.payload;
+            const animations = sortingFunc(
+                state.sortingItems.map((item) => item.value)
+            );
+            console.log(animations);
+            return {
+                ...state,
+                animationSteps: animations,
+                playingIndex: -1,
+            };
+        case Types.RESET_ITEMS_STATE:
+            return {
+                ...state,
+                sortingItems: getResetState(state.sortingItems),
+                playingIndex: -1,
+            };
+        case Types.START_PLAY:
+            return {
+                ...state,
+                playing: true,
+            };
+        case Types.PAUSE_PLAY:
+            return {
+                ...state,
+                playing: false,
+            };
         default:
-          console.log('wrong action type');
-      }
-    case Types.RESET_SORTING_ITEMS:
-      const set = new Set();
-      const { length } = action.payload;
-      const items = new Array(length).fill(0).map((_) => {
-        let randomNum = Math.floor(Math.random() * 130) + 1;
-        while (set.has(randomNum)) {
-          randomNum = Math.floor(Math.random() * 130) + 1;
-        }
-        set.add(randomNum);
-        return {
-          value: randomNum,
-          comparing: false,
-          switching: false,
-          marking: false,
-        };
-      });
-      return {
-        ...state,
-        sortingItems: items,
-        playingIndex: -1,
-      };
-    case Types.COMPARE_ITEMS:
-      return compareItems(action.payload.indices);
-    case Types.SWITCH_ITEMS:
-      return switchItems(action.payload.indices);
-    case Types.GENERATE_ANIMATION:
-      const { sortingFunc } = action.payload;
-      const animations = sortingFunc(
-        state.sortingItems.map((item) => item.value)
-      );
-      console.log(animations);
-      return {
-        ...state,
-        animationSteps: animations,
-        playingIndex: -1,
-      };
-    case Types.RESET_ITEMS_STATE:
-      return {
-        ...state,
-        sortingItems: getResetState(state.sortingItems),
-        playingIndex: -1,
-      };
-    case Types.START_PLAY:
-      return {
-        ...state,
-        playing: true,
-      };
-    case Types.PAUSE_PLAY:
-      return {
-        ...state,
-        playing: false,
-      };
-    default:
-      return state;
-  }
+            return state;
+    }
 };
 
 export default SortingArrayReducer;
