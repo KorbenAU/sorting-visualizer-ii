@@ -4,7 +4,7 @@ import SortingPlayerPage from './pages/SortingPlayerPage';
 function App() {
   return (
     <>
-      <div className='h-screen w-screen'>
+      <div className="h-screen w-screen">
         <SortingPlayerPage />
       </div>
     </>

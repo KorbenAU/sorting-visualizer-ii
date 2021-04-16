@@ -12,6 +12,7 @@ const Button = ({ onClick, children }) => {
     'px-2',
     'py-1.5',
     'm-1',
+    'mx-3',
     'rounded-md',
     'border-black',
     'shadow-lg',
