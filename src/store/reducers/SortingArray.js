@@ -74,7 +74,10 @@ const changeItems = (index, newValue, state) => {
 };
 
 const SortingArrayReducer = (state = INITIAL_STATE, action) => {
-    console.log(action.type);
+    console.log(
+        '🚀 ~ file: SortingArray.js ~ line 77 ~ SortingArrayReducer ~ action',
+        action.type
+    );
     switch (action.type) {
         case Types.NEXT_STEP:
             const nextIndex = state.playingIndex + 1;
@@ -125,7 +128,6 @@ const SortingArrayReducer = (state = INITIAL_STATE, action) => {
             const animations = sortingFunc(
                 state.sortingItems.map((item) => item.value)
             );
-            console.log(animations);
             return {
                 ...state,
                 animationSteps: animations,
